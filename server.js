@@ -142,6 +142,14 @@ io.on('connection', (socket) => {
       }
     }
   });
+
+  // Handle user typing
+  socket.on('user-typing', (roomId) => {
+    if (currentRoom && rooms[currentRoom] && roomId === currentRoom) {
+      // Broadcast to all other users in the room
+      socket.to(roomId).emit('user-typing', socket.id);
+    }
+  });
 });
 
 const PORT = process.env.PORT || 3000;

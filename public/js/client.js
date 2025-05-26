@@ -91,6 +91,27 @@ function setupSocketListeners() {
     showWelcomeScreen();
     showNotification('Room has been deleted', 'info');
   });
+
+  socket.on('user-typing', (userId) => {
+    const userElement = Array.from(usersList.children).find(li =>
+      li.dataset.userId === userId
+    );
+    if (userElement) {
+      const typingIndicator = userElement.querySelector('.typing-indicator') ||
+        document.createElement('span');
+      typingIndicator.className = 'typing-indicator';
+      typingIndicator.textContent = ' (typing...)';
+      if (!userElement.querySelector('.typing-indicator')) {
+        userElement.appendChild(typingIndicator);
+      }
+
+      // Clear typing indicator after 2 seconds
+      setTimeout(() => {
+        const indicator = userElement.querySelector('.typing-indicator');
+        if (indicator) indicator.remove();
+      }, 2000);
+    }
+  });
 }
 
 // Create a new room
@@ -146,13 +167,16 @@ function exitRoom() {
 // Handle text editor changes
 function handleTextChange() {
   isTyping = true;
-  
+
+  // Emit typing event
+  socket.emit('user-typing', currentRoom);
+
   // Update save status to saving
   updateSaveStatus('saving');
-  
+
   // Clear previous timeout
   if (saveTimeout) clearTimeout(saveTimeout);
-  
+
   // Set a new timeout to emit the updated text
   saveTimeout = setTimeout(() => {
     socket.emit('text-update', textEditor.value);
@@ -176,6 +200,8 @@ function renderUsersList(users) {
       <i class="fas fa-user"></i>
       ${user.name} ${isCurrentUser ? '(You)' : ''}
     `;
+    
+    li.dataset.userId = user.id;
     
     if (isCurrentUser) {
       li.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
