@@ -25,13 +25,18 @@ function randomIdGenerator() {
 // Socket.IO connection
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
-  
+
   let currentRoom = null;
 
   // Create a new room
-  socket.on('create-room', () => {
+  socket.on('create-room', (options = {}) => {
     const roomId = randomIdGenerator();
-    rooms[roomId] = { text: '', users: [] };
+    rooms[roomId] = {
+      text: '',
+      users: [],
+      password: options.password || null,
+      isPrivate: !!options.password
+    };
 
     // Join the room immediately after creation
     socket.join(roomId);
@@ -39,7 +44,12 @@ io.on('connection', (socket) => {
 
     // Add user to room
     const username = `User-${socket.id.substring(0, 5)}`;
-    rooms[roomId].users.push({ id: socket.id, name: username });
+    rooms[roomId].users.push({
+      id: socket.id,
+      name: username,
+      status: 'online',
+      lastSeen: new Date()
+    });
 
     // Emit both events to properly initialize the room
     socket.emit('room-created', roomId);
@@ -55,7 +65,7 @@ io.on('connection', (socket) => {
   });
 
   // Join a room
-  socket.on('join-room', (roomId) => {
+  socket.on('join-room', (roomId, password) => {
     // Leave previous room if any
     if (currentRoom) {
       socket.leave(currentRoom);
@@ -65,24 +75,40 @@ io.on('connection', (socket) => {
 
     // Check if room exists
     if (!rooms[roomId]) {
-      rooms[roomId] = { text: '', users: [] };
+      rooms[roomId] = {
+        text: '',
+        users: [],
+        password: null,
+        isPrivate: false
+      };
+    }
+
+    // Check password if room is private
+    if (rooms[roomId].isPrivate && rooms[roomId].password !== password) {
+      socket.emit('join-error', 'Incorrect room password');
+      return;
     }
 
     // Join the room
     socket.join(roomId);
     currentRoom = roomId;
-    
+
     // Add user to room
     const username = `User-${socket.id.substring(0, 5)}`;
-    rooms[roomId].users.push({ id: socket.id, name: username });
-    
+    rooms[roomId].users.push({
+      id: socket.id,
+      name: username,
+      status: 'online',
+      lastSeen: new Date()
+    });
+
     // Send room data to the user
     socket.emit('room-joined', {
       roomId,
       text: rooms[roomId].text,
       username
     });
-    
+
     // Update all users in the room
     io.to(roomId).emit('update-users', rooms[roomId].users);
     console.log(`User ${socket.id} joined room: ${roomId}`);
@@ -130,16 +156,23 @@ io.on('connection', (socket) => {
   // Disconnect
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
-    
+
     if (currentRoom && rooms[currentRoom]) {
-      rooms[currentRoom].users = rooms[currentRoom].users.filter(user => user.id !== socket.id);
-      io.to(currentRoom).emit('update-users', rooms[currentRoom].users);
-      
-      // Remove empty rooms
-      if (rooms[currentRoom].users.length === 0) {
-        delete rooms[currentRoom];
-        console.log(`Empty room removed: ${currentRoom}`);
+      // Update user status to offline
+      const user = rooms[currentRoom].users.find(u => u.id === socket.id);
+      if (user) {
+        user.status = 'offline';
+        user.lastSeen = new Date();
+        io.to(currentRoom).emit('update-users', rooms[currentRoom].users);
       }
+
+      // Remove empty rooms after delay to allow reconnection
+      setTimeout(() => {
+        if (rooms[currentRoom] && rooms[currentRoom].users.every(u => u.status === 'offline')) {
+          delete rooms[currentRoom];
+          console.log(`Empty room removed: ${currentRoom}`);
+        }
+      }, 30000); // 30-second delay
     }
   });
 
@@ -149,6 +182,23 @@ io.on('connection', (socket) => {
       // Broadcast to all other users in the room
       socket.to(roomId).emit('user-typing', socket.id);
     }
+  });
+
+  // Handle user reconnecting
+  socket.on('reconnect-user', (roomId) => {
+    if (rooms[roomId]) {
+      const user = rooms[roomId].users.find(u => u.id === socket.id);
+      if (user) {
+        user.status = 'online';
+        user.lastSeen = new Date();
+        io.to(roomId).emit('update-users', rooms[roomId].users);
+      }
+    }
+  });
+
+  // Handle room check
+  socket.on('check-room', (roomId, callback) => {
+    callback(rooms[roomId]?.isPrivate || false);
   });
 });
 

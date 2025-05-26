@@ -112,11 +112,36 @@ function setupSocketListeners() {
       }, 2000);
     }
   });
+
+  socket.on('reconnect', () => {
+    if (currentRoom) {
+      socket.emit('reconnect-user', currentRoom);
+    }
+  });
+
+  socket.on('join-error', (message) => {
+    showNotification(message, 'error');
+  });
+
+  socket.on('check-room', (roomId, callback) => {
+    callback(rooms[roomId]?.isPrivate || false);
+  });
 }
 
 // Create a new room
 function createRoom() {
-  socket.emit('create-room');
+  const usePassword = confirm('Do you want to password-protect this room?');
+  let password = '';
+
+  if (usePassword) {
+    password = prompt('Enter room password (min 4 characters):');
+    if (password && password.length < 4) {
+      showNotification('Password must be at least 4 characters', 'error');
+      return;
+    }
+  }
+
+  socket.emit('create-room', { password });
 }
 
 // Join an existing room
@@ -126,8 +151,19 @@ function joinRoom() {
     showNotification('Please enter a valid room ID', 'error');
     return;
   }
-  
-  socket.emit('join-room', roomId);
+
+  // Check if room exists and is private
+  socket.emit('check-room', roomId, (isPrivate) => {
+    let password = '';
+    if (isPrivate) {
+      password = prompt('This room is password protected. Enter password:');
+      if (!password) {
+        showNotification('Password is required', 'error');
+        return;
+      }
+    }
+    socket.emit('join-room', roomId, password);
+  });
 }
 
 // Copy room ID to clipboard
@@ -189,27 +225,32 @@ function handleTextChange() {
 function renderUsersList(users) {
   usersList.innerHTML = '';
   userCount.textContent = users.length;
-  
+
   users.forEach(user => {
     const li = document.createElement('li');
-    
-    // Highlight the current user
+    li.dataset.userId = user.id;
+
     const isCurrentUser = user.id === socket.id;
-    
+    const statusClass = user.status === 'online' ? 'online' : 'offline';
+
     li.innerHTML = `
+      <span class="user-status ${statusClass}"></span>
       <i class="fas fa-user"></i>
       ${user.name} ${isCurrentUser ? '(You)' : ''}
+      ${user.status === 'offline' ? `<span class="last-seen">last seen ${formatLastSeen(user.lastSeen)}</span>` : ''}
     `;
-    
-    li.dataset.userId = user.id;
-    
+
     if (isCurrentUser) {
       li.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
       li.style.fontWeight = 'bold';
     }
-    
+
     usersList.appendChild(li);
   });
+}
+
+function formatLastSeen(date) {
+  return new Date(date).toLocaleTimeString();
 }
 
 // Show welcome screen
