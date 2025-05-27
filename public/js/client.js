@@ -377,7 +377,7 @@ function renderUsersList(users) {
     const isCurrentUser = user.id === socket.id;
 
     li.innerHTML = `
-      <i class="fas fa-user"></i>
+      <i class="fas fa-user-tie"></i>
       ${user.name} ${isCurrentUser ? '(You)' : ''}
     `;
 
