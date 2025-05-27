@@ -254,14 +254,14 @@ function createRoom() {
 }
 
 function storeRoomData(roomId) {
-  localStorage.setItem('shareTextRoom', JSON.stringify({
+  localStorage.setItem('shhNoteRoom', JSON.stringify({
     roomId,
     timestamp: Date.now()
   }));
 }
 
 function getStoredRoomData() {
-  const data = localStorage.getItem('shareTextRoom');
+  const data = localStorage.getItem('shhNoteRoom');
   if (!data) return null;
 
   try {
@@ -272,7 +272,7 @@ function getStoredRoomData() {
 }
 
 function clearStoredRoomData() {
-  localStorage.removeItem('shareTextRoom');
+  localStorage.removeItem('shhNoteRoom');
 }
 
 // Join an existing room
