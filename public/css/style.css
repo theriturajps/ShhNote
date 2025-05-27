@@ -176,12 +176,12 @@ main {
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
   width: 90%;
-  max-width: 400px;
+  max-width: 300px;
   overflow: hidden;
 }
 
 .modal-header {
-  padding: 15px;
+  padding: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -189,8 +189,12 @@ main {
 }
 
 .modal-header h3 {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: var(--dark);
+}
+
+.modal-body p {
+  font-size: 0.9rem;
 }
 
 .modal-body {
@@ -199,7 +203,7 @@ main {
 }
 
 #qr-code {
-  margin: 0 auto 20px;
+  margin: 0 auto 0;
   padding: 10px;
   background: white;
   display: inline-block;
@@ -222,6 +226,7 @@ main {
   padding: 10px;
   border: none;
   font-size: 0.9rem;
+  font-family: ui-monospace;
 }
 
 /* Room Screen */
