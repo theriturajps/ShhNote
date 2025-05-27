@@ -17,6 +17,12 @@ const userCount = document.getElementById('user-count');
 const saveStatus = document.getElementById('save-status');
 const statusIndicator = document.getElementById('status-indicator');
 const statusText = document.getElementById('status-text');
+const shareQrBtn = document.getElementById('share-qr-btn');
+const qrModal = document.getElementById('qr-modal');
+const closeQrModal = document.getElementById('close-qr-modal');
+const qrCodeElement = document.getElementById('qr-code');
+const roomUrlInput = document.getElementById('room-url-input');
+const copyUrlBtn = document.getElementById('copy-url-btn');
 
 import { initializeSocket, socket } from './socket.js';
 import { showNotification } from './notifications.js';
@@ -33,6 +39,7 @@ function init() {
   initializeSocket();
   bindEventListeners();
   setupSocketListeners();
+  checkForRoomInURL(); // Add this line
 
   // Check for stored room data immediately
   const storedData = getStoredRoomData();
@@ -47,6 +54,23 @@ function init() {
 function bindEventListeners() {
   createRoomBtn.addEventListener('click', createRoom);
   joinRoomBtn.addEventListener('click', joinRoom);
+  shareQrBtn.addEventListener('click', () => showQRModal(currentRoom));
+  closeQrModal.addEventListener('click', closeQRModal);
+
+  copyUrlBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(roomUrlInput.value).then(() => {
+      showNotification('Room URL copied', 'success');
+    }).catch(() => {
+      showNotification('Failed to copy room URL', 'error');
+    });
+  });
+
+  // Close modal when clicking outside
+  qrModal.addEventListener('click', (e) => {
+    if (e.target === qrModal) {
+      closeQRModal();
+    }
+  });
 
   // Replace the old roomIdInput event listeners with:
   [roomIdPart1, roomIdPart2, roomIdPart3].forEach(input => {
@@ -166,6 +190,62 @@ function setupSocketListeners() {
     showWelcomeScreen();
     showNotification('Room has been deleted', 'info');
   });
+}
+
+function generateQRCode(roomId) {
+  const roomUrl = `${window.location.origin}?room=${roomId}`;
+  roomUrlInput.value = roomUrl;
+
+  // Clear previous QR code
+  qrCodeElement.innerHTML = '';
+
+  // Create a canvas element
+  const canvas = document.createElement('canvas');
+  qrCodeElement.appendChild(canvas);
+
+  // Generate new QR code
+  QRCode.toCanvas(canvas, roomUrl, {
+    width: 200,
+    margin: 1,
+    color: {
+      dark: '#000',
+      light: '#fff'
+    }
+  }, (error) => {
+    if (error) {
+      console.error('QR code generation error:', error);
+      showNotification('Failed to generate QR code', 'error');
+    }
+  });
+}
+
+function showQRModal(roomId) {
+  generateQRCode(roomId);
+  qrModal.classList.add('show');
+}
+
+function closeQRModal() {
+  qrModal.classList.remove('show');
+}
+
+function checkForRoomInURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomId = urlParams.get('room');
+
+  if (roomId) {
+    // Validate room ID format (000-000-000)
+    const roomIdPattern = /^\d{3}-\d{3}-\d{3}$/;
+    if (roomIdPattern.test(roomId)) {
+      // Split the room ID into parts
+      const [part1, part2, part3] = roomId.split('-');
+      roomIdPart1.value = part1;
+      roomIdPart2.value = part2;
+      roomIdPart3.value = part3;
+
+      // Auto-focus the join button
+      joinRoomBtn.focus();
+    }
+  }
 }
 
 // Create a new room

@@ -150,6 +150,80 @@ main {
   color: var(--gray);
 }
 
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal.show {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-content {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  width: 90%;
+  max-width: 400px;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.modal-header h3 {
+  font-size: 1.2rem;
+  color: var(--dark);
+}
+
+.modal-body {
+  padding: 20px;
+  text-align: center;
+}
+
+#qr-code {
+  margin: 0 auto 20px;
+  padding: 10px;
+  background: white;
+  display: inline-block;
+}
+
+.room-url {
+  display: flex;
+  margin-top: 15px;
+  border: 1px solid var(--gray-light);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+#room-url-input:focus {
+  outline: none;
+}
+
+#room-url-input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  font-size: 0.9rem;
+}
+
 /* Room Screen */
 #room-screen {
   flex-direction: column;

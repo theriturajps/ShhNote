@@ -8,6 +8,8 @@
   <title>ShareText - Real-time Text Sharing</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Add QRCode.js library [ <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script> ] -->
+  <script src="./js/qrcode.min.js"></script>
 </head>
 
 <body>
@@ -55,6 +57,9 @@
             <button id="copy-room-id" class="icon-btn" title="Copy ID">
               <i class="fas fa-copy"></i>
             </button>
+            <button id="share-qr-btn" class="icon-btn" title="Share QR Code">
+              <i class="fas fa-qrcode"></i>
+            </button>
           </div>
           <div class="room-actions">
             <button id="clear-room-btn" class="action-btn" title="Clear">
@@ -89,6 +94,28 @@
 
     <!-- Notifications -->
     <div id="notification-container"></div>
+
+    <!-- QR Code Modal -->
+    <div id="qr-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Share Room</h3>
+          <button id="close-qr-modal" class="icon-btn">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="qr-code"></div>
+          <p>Scan this QR code to join the room</p>
+          <div class="room-url">
+            <input type="text" id="room-url-input" readonly>
+            <button id="copy-url-btn" class="icon-btn" title="Copy URL">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Scripts -->
     <script src="/socket.io/socket.io.js"></script>
