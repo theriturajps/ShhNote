@@ -130,20 +130,94 @@ main {
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   text-align: center;
 }
 
-.welcome-card h2 {
+.logo-container {
+  text-align: center;
   margin-bottom: 20px;
+}
+
+.welcome-logo {
+  height: 40px;
+  margin-bottom: 15px;
+}
+
+.welcome-description {
+  color: var(--gray);
+  font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
   color: var(--dark);
-  font-size: 1.3rem;
+  padding: 8px 12px;
+  background: rgba(74, 107, 255, 0.05);
+  border-radius: var(--border-radius);
+}
+
+.feature-item i {
+  color: var(--primary);
+  width: 20px;
+  text-align: center;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+  color: var(--gray);
+  font-size: 0.85rem;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.divider::before {
+  margin-right: 10px;
+}
+
+.divider::after {
+  margin-left: 10px;
+}
+
+.welcome-footer {
+  margin-top: 20px;
+  font-size: 0.70rem;
+  color: var(--gray);
+  text-align: center;
+  padding-top: 15px;
+  border-top: 1px solid var(--gray-light);
+}
+
+.welcome-card h2 {
+  margin-bottom: 10px;
+  color: var(--dark);
+  font-size: 1rem;
 }
 
 .button-group {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
 }
 
 .join-room-container {
@@ -167,7 +241,7 @@ main {
   width: 40px;
   text-align: center;
   border: none;
-  padding: 10px 0;
+  padding: 8px 0;
   font-size: 0.95rem;
 }
 
@@ -387,7 +461,7 @@ button {
   border: none;
   border-radius: var(--border-radius);
   padding: 10px 15px;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -406,9 +480,10 @@ button {
 }
 
 .secondary-btn {
-  background: var(--accent);
+  background: var(--dark);
   color: white;
   font-weight: 500;
+  padding: 10px 25px;
 }
 
 .secondary-btn:hover {
