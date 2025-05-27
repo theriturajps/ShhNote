@@ -24,6 +24,7 @@ let username = '';
 let currentRoom = '';
 let isTyping = false;
 let saveTimeout = null;
+let typingTimeout = null;
 
 // Initialize the application
 function init() {
@@ -51,22 +52,22 @@ function setupSocketListeners() {
   socket.on('connect', () => {
     updateConnectionStatus('connected');
   });
-  
+
   socket.on('disconnect', () => {
     updateConnectionStatus('disconnected');
   });
-  
+
   socket.on('connect_error', () => {
     updateConnectionStatus('disconnected');
     showNotification('Unable to connect to server', 'error');
   });
-  
+
   socket.on('room-created', (roomId) => {
     currentRoom = roomId;
     showRoom(roomId);
     showNotification('Room created successfully', 'success');
   });
-  
+
   socket.on('room-joined', (data) => {
     currentRoom = data.roomId;
     username = data.username;
@@ -74,22 +75,16 @@ function setupSocketListeners() {
     textEditor.value = data.text;
     showNotification('Joined room successfully', 'success');
   });
-  
+
   socket.on('text-updated', (text) => {
-    // Only update if the user isn't currently typing
     if (!isTyping) {
       textEditor.value = text;
     }
     updateSaveStatus('saved');
   });
-  
+
   socket.on('update-users', (users) => {
     renderUsersList(users);
-  });
-  
-  socket.on('room-deleted', () => {
-    showWelcomeScreen();
-    showNotification('Room has been deleted', 'info');
   });
 
   socket.on('user-typing', (userId) => {
@@ -97,20 +92,27 @@ function setupSocketListeners() {
       li.dataset.userId === userId
     );
     if (userElement) {
-      const typingIndicator = userElement.querySelector('.typing-indicator') ||
-        document.createElement('span');
-      typingIndicator.className = 'typing-indicator';
-      typingIndicator.textContent = ' (typing...)';
-      if (!userElement.querySelector('.typing-indicator')) {
-        userElement.appendChild(typingIndicator);
+      let indicator = userElement.querySelector('.typing-indicator');
+      if (!indicator) {
+        indicator = document.createElement('span');
+        indicator.className = 'typing-indicator';
+        userElement.appendChild(indicator);
       }
+      indicator.textContent = 'typing...';
+
+      // Clear previous timeout
+      if (typingTimeout) clearTimeout(typingTimeout);
 
       // Clear typing indicator after 2 seconds
-      setTimeout(() => {
-        const indicator = userElement.querySelector('.typing-indicator');
-        if (indicator) indicator.remove();
+      typingTimeout = setTimeout(() => {
+        indicator.textContent = '';
       }, 2000);
     }
+  });
+
+  socket.on('room-deleted', () => {
+    showWelcomeScreen();
+    showNotification('Room has been deleted', 'info');
   });
 }
 
@@ -126,14 +128,13 @@ function joinRoom() {
     showNotification('Please enter a valid room ID', 'error');
     return;
   }
-  
   socket.emit('join-room', roomId);
 }
 
 // Copy room ID to clipboard
 function copyRoomId() {
   navigator.clipboard.writeText(currentRoom).then(() => {
-    showNotification('Room ID copied to clipboard', 'success');
+    showNotification('Room ID copied', 'success');
   }).catch(() => {
     showNotification('Failed to copy room ID', 'error');
   });
@@ -141,17 +142,17 @@ function copyRoomId() {
 
 // Clear room content
 function clearRoom() {
-  if (confirm('Are you sure you want to clear all text in this room?')) {
+  if (confirm('Clear all text in this room?')) {
     socket.emit('clear-room');
     textEditor.value = '';
     updateSaveStatus('saved');
-    showNotification('Room content cleared', 'info');
+    showNotification('Room cleared', 'info');
   }
 }
 
 // Delete the room
 function deleteRoom() {
-  if (confirm('Are you sure you want to delete this room? This action cannot be undone.')) {
+  if (confirm('Delete this room? This cannot be undone.')) {
     socket.emit('delete-room');
     showWelcomeScreen();
   }
@@ -171,13 +172,10 @@ function handleTextChange() {
   // Emit typing event
   socket.emit('user-typing', currentRoom);
 
-  // Update save status to saving
   updateSaveStatus('saving');
 
-  // Clear previous timeout
   if (saveTimeout) clearTimeout(saveTimeout);
 
-  // Set a new timeout to emit the updated text
   saveTimeout = setTimeout(() => {
     socket.emit('text-update', textEditor.value);
     isTyping = false;
@@ -189,25 +187,22 @@ function handleTextChange() {
 function renderUsersList(users) {
   usersList.innerHTML = '';
   userCount.textContent = users.length;
-  
+
   users.forEach(user => {
     const li = document.createElement('li');
-    
-    // Highlight the current user
+    li.dataset.userId = user.id;
+
     const isCurrentUser = user.id === socket.id;
-    
+
     li.innerHTML = `
       <i class="fas fa-user"></i>
       ${user.name} ${isCurrentUser ? '(You)' : ''}
     `;
-    
-    li.dataset.userId = user.id;
-    
+
     if (isCurrentUser) {
-      li.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-      li.style.fontWeight = 'bold';
+      li.style.backgroundColor = 'rgba(74, 107, 255, 0.1)';
     }
-    
+
     usersList.appendChild(li);
   });
 }
@@ -237,7 +232,7 @@ function updateSaveStatus(status) {
 function updateConnectionStatus(status) {
   statusIndicator.className = status;
   statusText.textContent = status === 'connected' ? 'Connected' : 'Disconnected';
-  
+
   if (status === 'disconnected') {
     showNotification('Disconnected from server', 'error');
   }

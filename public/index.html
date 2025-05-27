@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
   <div class="app-container">
     <header>
@@ -17,66 +19,66 @@
       </div>
     </header>
 
-    <!-- Welcome Screen -->
-    <div id="welcome-screen" class="screen active">
-      <div class="welcome-card">
-        <h2>Welcome to ShareText</h2>
-        <p>Create or join a room to start sharing text in real-time</p>
-        
-        <div class="button-group">
-          <button id="create-room-btn" class="primary-btn">
-            <i class="fas fa-plus-circle"></i> Create Room
-          </button>
-          
-          <div class="join-room-container">
-            <input type="text" id="room-id-input" placeholder="Enter room ID">
-            <button id="join-room-btn" class="secondary-btn">
-              <i class="fas fa-sign-in-alt"></i> Join
+    <main>
+      <!-- Welcome Screen -->
+      <div id="welcome-screen" class="screen active">
+        <div class="welcome-card">
+          <h2>Start Sharing</h2>
+          <div class="button-group">
+            <button id="create-room-btn" class="primary-btn">
+              <i class="fas fa-plus"></i> New Room
             </button>
+
+            <div class="join-room-container">
+              <input type="text" id="room-id-input" placeholder="Room ID">
+              <button id="join-room-btn" class="secondary-btn">
+                <i class="fas fa-sign-in-alt"></i> Join
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Room Screen -->
-    <div id="room-screen" class="screen">
-      <div class="room-info">
-        <div class="room-id-container">
-          <span>Room ID: </span>
-          <span id="current-room-id" class="room-id"></span>
-          <button id="copy-room-id" class="icon-btn" title="Copy Room ID">
-            <i class="fas fa-copy"></i>
-          </button>
+      <!-- Room Screen -->
+      <div id="room-screen" class="screen">
+        <div class="room-header">
+          <div class="room-id-container">
+            <span>Room: </span>
+            <span id="current-room-id" class="room-id"></span>
+            <button id="copy-room-id" class="icon-btn" title="Copy ID">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+          <div class="room-actions">
+            <button id="clear-room-btn" class="action-btn" title="Clear">
+              <i class="fas fa-eraser"></i>
+            </button>
+            <button id="delete-room-btn" class="action-btn danger-btn" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+            <button id="exit-room-btn" class="action-btn" title="Exit">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          </div>
         </div>
-        <div class="room-actions">
-          <button id="clear-room-btn" class="action-btn" title="Clear Room">
-            <i class="fas fa-eraser"></i> Clear
-          </button>
-          <button id="delete-room-btn" class="action-btn danger-btn" title="Delete Room">
-            <i class="fas fa-trash-alt"></i> Delete
-          </button>
-          <button id="exit-room-btn" class="action-btn" title="Exit Room">
-            <i class="fas fa-sign-out-alt"></i> Exit
-          </button>
+
+        <div class="editor-container">
+          <textarea id="text-editor" placeholder="Start typing here..."></textarea>
+          <div class="editor-footer">
+            <span id="save-status">Saved</span>
+            <div class="users-count">
+              <i class="fas fa-users"></i>
+              <span id="user-count">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="users-panel">
+          <h3><i class="fas fa-users"></i> Active Users</h3>
+          <ul id="users-list"></ul>
         </div>
       </div>
-
-      <div class="editor-container">
-        <div class="editor-header">
-          <h3>Document</h3>
-          <span id="save-status">Saved</span>
-        </div>
-        <textarea id="text-editor" placeholder="Start typing here..."></textarea>
-      </div>
-
-      <div class="users-panel">
-        <div class="users-header">
-          <h3>Users in Room</h3>
-          <span id="user-count">0</span>
-        </div>
-        <ul id="users-list"></ul>
-      </div>
-    </div>
+    </main>
 
     <!-- Notifications -->
     <div id="notification-container"></div>
@@ -86,4 +88,5 @@
     <script src="js/client.js" type="module"></script>
   </div>
 </body>
+
 </html>
