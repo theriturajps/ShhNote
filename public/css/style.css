@@ -119,21 +119,35 @@ main {
 
 .join-room-container {
   display: flex;
+  justify-content: space-between;
   gap: 8px;
 }
 
-#room-id-input {
-  flex: 1;
-  padding: 10px 12px;
+.room-code-input {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: white;
   border: 1px solid var(--gray-light);
   border-radius: var(--border-radius);
+  justify-content: space-evenly;
+  padding: 0 10px;
+}
+
+.room-code-input input {
+  width: 40px;
+  text-align: center;
+  border: none;
+  padding: 10px 0;
   font-size: 0.95rem;
 }
 
-#room-id-input:focus {
+.room-code-input input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.2);
+}
+
+.room-code-input span {
+  color: var(--gray);
 }
 
 /* Room Screen */

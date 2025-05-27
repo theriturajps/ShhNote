@@ -19,7 +19,10 @@ const rooms = {};
 
 // Generate random room ID
 function randomIdGenerator() {
-  return `${Math.trunc(Math.random() * 999)}-${Math.trunc(Math.random() * 999)}`;
+  const part1 = Math.trunc(Math.random() * 1000).toString().padStart(3, '0');
+  const part2 = Math.trunc(Math.random() * 1000).toString().padStart(3, '0');
+  const part3 = Math.trunc(Math.random() * 1000).toString().padStart(3, '0');
+  return `${part1}-${part2}-${part3}`;
 }
 
 io.on('connection', (socket) => {

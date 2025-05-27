@@ -3,7 +3,9 @@ const welcomeScreen = document.getElementById('welcome-screen');
 const roomScreen = document.getElementById('room-screen');
 const createRoomBtn = document.getElementById('create-room-btn');
 const joinRoomBtn = document.getElementById('join-room-btn');
-const roomIdInput = document.getElementById('room-id-input');
+const roomIdPart1 = document.getElementById('part1');
+const roomIdPart2 = document.getElementById('part2');
+const roomIdPart3 = document.getElementById('part3');
 const currentRoomId = document.getElementById('current-room-id');
 const copyRoomIdBtn = document.getElementById('copy-room-id');
 const clearRoomBtn = document.getElementById('clear-room-btn');
@@ -37,9 +39,42 @@ function init() {
 function bindEventListeners() {
   createRoomBtn.addEventListener('click', createRoom);
   joinRoomBtn.addEventListener('click', joinRoom);
-  roomIdInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') joinRoom();
+
+  // Replace the old roomIdInput event listeners with:
+  [roomIdPart1, roomIdPart2, roomIdPart3].forEach(input => {
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') joinRoom();
+    });
+
+    input.addEventListener('input', (e) => {
+      if (e.target.value.length === 3 && e.target.id.startsWith('part')) {
+        const nextPart = e.target.id.replace(/\d+/, (match) => parseInt(match) + 1);
+        const nextInput = document.getElementById(nextPart);
+        if (nextInput) nextInput.focus();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      // Only allow numbers and navigation keys
+      if (!/[0-9]|Backspace|ArrowLeft|ArrowRight|Delete|Tab/.test(e.key)) {
+        e.preventDefault();
+      }
+    });
+
+    input.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const paste = e.clipboardData.getData('text');
+      const numbers = paste.replace(/\D/g, '');
+      if (numbers.length === 9) {
+        roomIdPart1.value = numbers.substr(0, 3);
+        roomIdPart2.value = numbers.substr(3, 3);
+        roomIdPart3.value = numbers.substr(6, 3);
+        roomIdPart3.focus();
+      }
+    });
   });
+
+  // Keep the rest of your existing event listeners
   copyRoomIdBtn.addEventListener('click', copyRoomId);
   clearRoomBtn.addEventListener('click', clearRoom);
   deleteRoomBtn.addEventListener('click', deleteRoom);
@@ -123,11 +158,16 @@ function createRoom() {
 
 // Join an existing room
 function joinRoom() {
-  const roomId = roomIdInput.value.trim();
-  if (!roomId) {
-    showNotification('Please enter a valid room ID', 'error');
+  const part1 = roomIdPart1.value.trim();
+  const part2 = roomIdPart2.value.trim();
+  const part3 = roomIdPart3.value.trim();
+
+  if (!part1 || !part2 || !part3) {
+    showNotification('Please enter a complete room ID', 'error');
     return;
   }
+
+  const roomId = `${part1}-${part2}-${part3}`;
   socket.emit('join-room', roomId);
 }
 
@@ -182,6 +222,27 @@ function handleTextChange() {
     updateSaveStatus('saved');
   }, 500);
 }
+
+document.querySelectorAll('.room-code-input input').forEach(input => {
+  input.addEventListener('keydown', (e) => {
+    // Only allow numbers and navigation keys
+    if (!/[0-9]|Backspace|ArrowLeft|ArrowRight|Delete|Tab/.test(e.key)) {
+      e.preventDefault();
+    }
+  });
+
+  input.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const paste = e.clipboardData.getData('text');
+    const numbers = paste.replace(/\D/g, '');
+    if (numbers.length === 9) {
+      document.getElementById('part1').value = numbers.substr(0, 3);
+      document.getElementById('part2').value = numbers.substr(3, 3);
+      document.getElementById('part3').value = numbers.substr(6, 3);
+      document.getElementById('part3').focus();
+    }
+  });
+});
 
 // Render users list
 function renderUsersList(users) {
