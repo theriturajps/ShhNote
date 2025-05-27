@@ -70,6 +70,17 @@ header h1 {
   color: var(--primary-dark);
 }
 
+.header-icon {
+  height: 20px;
+  width: auto;
+  display: block;
+  transition: opacity 0.2s ease;
+}
+
+.header-link a:hover .header-icon {
+  opacity: 0.8;
+}
+
 .connection-status {
   display: flex;
   align-items: center;
