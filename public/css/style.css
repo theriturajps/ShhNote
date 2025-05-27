@@ -52,6 +52,24 @@ header h1 {
   gap: 10px;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-link a {
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.header-link a:hover {
+  color: var(--primary-dark);
+}
+
 .connection-status {
   display: flex;
   align-items: center;
