@@ -78,6 +78,33 @@ io.on('connection', (socket) => {
     io.to(roomId).emit('update-users', rooms[roomId].users);
   });
 
+  // Rejoin room
+  socket.on('rejoin-room', (roomId) => {
+    if (currentRoom) {
+      socket.leave(currentRoom);
+      rooms[currentRoom].users = rooms[currentRoom].users.filter(user => user.id !== socket.id);
+      io.to(currentRoom).emit('update-users', rooms[currentRoom].users);
+    }
+
+    if (!rooms[roomId]) {
+      rooms[roomId] = { text: '', users: [] };
+    }
+
+    socket.join(roomId);
+    currentRoom = roomId;
+
+    const username = `User-${socket.id.substring(0, 5)}`;
+    rooms[roomId].users.push({ id: socket.id, name: username });
+
+    socket.emit('room-joined', {
+      roomId,
+      text: rooms[roomId].text,
+      username
+    });
+
+    io.to(roomId).emit('update-users', rooms[roomId].users);
+  });
+
   // Text update
   socket.on('text-update', (text) => {
     if (currentRoom && rooms[currentRoom]) {

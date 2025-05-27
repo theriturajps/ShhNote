@@ -33,6 +33,14 @@ function init() {
   initializeSocket();
   bindEventListeners();
   setupSocketListeners();
+
+  // Check for stored room data immediately
+  const storedData = getStoredRoomData();
+  if (storedData && storedData.roomId) {
+    // Show "Reconnecting..." status
+    updateConnectionStatus('connecting');
+    statusText.textContent = 'Reconnecting...';
+  }
 }
 
 // Bind DOM event listeners
@@ -86,6 +94,14 @@ function bindEventListeners() {
 function setupSocketListeners() {
   socket.on('connect', () => {
     updateConnectionStatus('connected');
+
+    // Auto-rejoin room if we have stored data and not already in a room
+    if (!currentRoom) {
+      const storedData = getStoredRoomData();
+      if (storedData && storedData.roomId) {
+        socket.emit('join-room', storedData.roomId);
+      }
+    }
   });
 
   socket.on('disconnect', () => {
@@ -106,6 +122,7 @@ function setupSocketListeners() {
   socket.on('room-joined', (data) => {
     currentRoom = data.roomId;
     username = data.username;
+    storeRoomData(data.roomId); // Store the room ID
     showRoom(data.roomId);
     textEditor.value = data.text;
     showNotification('Joined room successfully', 'success');
@@ -156,6 +173,28 @@ function createRoom() {
   socket.emit('create-room');
 }
 
+function storeRoomData(roomId) {
+  localStorage.setItem('shareTextRoom', JSON.stringify({
+    roomId,
+    timestamp: Date.now()
+  }));
+}
+
+function getStoredRoomData() {
+  const data = localStorage.getItem('shareTextRoom');
+  if (!data) return null;
+
+  try {
+    return JSON.parse(data);
+  } catch {
+    return null;
+  }
+}
+
+function clearStoredRoomData() {
+  localStorage.removeItem('shareTextRoom');
+}
+
 // Join an existing room
 function joinRoom() {
   const part1 = roomIdPart1.value.trim();
@@ -193,6 +232,7 @@ function clearRoom() {
 // Delete the room
 function deleteRoom() {
   if (confirm('Delete this room? This cannot be undone.')) {
+    clearStoredRoomData();
     socket.emit('delete-room');
     showWelcomeScreen();
   }
@@ -200,6 +240,7 @@ function deleteRoom() {
 
 // Exit the room
 function exitRoom() {
+  clearStoredRoomData();
   socket.emit('exit-room');
   showWelcomeScreen();
   showNotification('You left the room', 'info');

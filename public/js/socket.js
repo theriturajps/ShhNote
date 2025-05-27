@@ -4,13 +4,18 @@ let socket;
 
 function initializeSocket() {
   // Initialize socket connection
-  socket = io();
-  
+  socket = io({
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000
+  });
+
   // Set up logging for socket events (development only)
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
     setupSocketLogging();
   }
-  
+
   return socket;
 }
 
