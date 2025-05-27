@@ -148,7 +148,7 @@ main {
 
 .join-room-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   gap: 8px;
 }
 
@@ -243,6 +243,7 @@ main {
   margin-top: 15px;
   border: 1px solid var(--gray-light);
   border-radius: var(--border-radius);
+  align-items: center;
   overflow: hidden;
 }
 
@@ -443,6 +444,10 @@ button {
 
 .icon-btn:hover {
   background: rgba(74, 107, 255, 0.1);
+}
+
+#copy-url-btn {
+  margin-right: 5px;
 }
 
 /* Notifications */
