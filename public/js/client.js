@@ -192,20 +192,6 @@ function setupSocketListeners() {
   });
 }
 
-function updateTextCount() {
-  const textArea = document.getElementById('text-editor');
-  const output = document.getElementById('text-count');
-
-  const text = textArea.value.trim();
-
-  const charCount = text.length;
-  const wordCount = text === '' ? 0 : text.split(/\s+/).length;
-
-  output.textContent = `${wordCount} word${wordCount !== 1 ? 's' : ''}, ${charCount} character${charCount !== 1 ? 's' : ''}`;
-}
-
-document.getElementById('text-editor').addEventListener('input', updateTextCount);
-
 function generateQRCode(roomId) {
   const roomUrl = `${window.location.origin}?room=${roomId}`;
   roomUrlInput.value = roomUrl;
