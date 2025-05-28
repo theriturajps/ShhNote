@@ -44,7 +44,6 @@ function init() {
   // Check for stored room data immediately
   const storedData = getStoredRoomData();
   if (storedData && storedData.roomId) {
-    // Show "Reconnecting..." status
     updateConnectionStatus('connecting');
     statusText.textContent = 'Reconnecting...';
   }
