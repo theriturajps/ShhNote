@@ -49,7 +49,6 @@ header h1 {
   color: var(--primary);
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .header-right {
