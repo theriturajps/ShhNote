@@ -1,0 +1,27 @@
+{
+	"name": "Shh! Note",
+	"short_name": "ShhNote",
+	"description": "Real-time Anonymous Text Sharing",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#f5f7fb",
+	"theme_color": "#4a6bff",
+	"icons": [
+		{
+			"src": "./images/logo-192.png",
+			"type": "image/png",
+			"sizes": "192x192"
+		},
+		{
+			"src": "./images/logo-512.png",
+			"type": "image/png",
+			"sizes": "512x512"
+		},
+		{
+			"src": "./images/logo-512.png",
+			"type": "image/png",
+			"sizes": "512x512",
+			"purpose": "maskable"
+		}
+	]
+}

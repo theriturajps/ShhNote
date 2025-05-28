@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import favicon from 'serve-favicon';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -13,6 +14,12 @@ const io = new Server(server);
 
 // Serve static files
 app.use(express.static(join(__dirname, 'public')));
+app.use(favicon(join(__dirname, 'public', 'images', 'logo.png')));
+
+// Ensure all routes serve index.html for SPA
+app.get('*', (req, res) => {
+  res.sendFile(join(__dirname, 'public', 'index.html'));
+});
 
 // Store active rooms data
 const rooms = {};
