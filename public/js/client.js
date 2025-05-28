@@ -23,6 +23,7 @@ const closeQrModal = document.getElementById('close-qr-modal');
 const qrCodeElement = document.getElementById('qr-code');
 const roomUrlInput = document.getElementById('room-url-input');
 const copyUrlBtn = document.getElementById('copy-url-btn');
+const installBtn = document.getElementById('install-btn')
 
 import { initializeSocket, socket } from './socket.js';
 import { showNotification } from './notifications.js';
@@ -52,6 +53,7 @@ function init() {
   bindEventListeners();
   setupSocketListeners();
   checkForRoomInURL();
+  setupPWAInstallPrompt();
 
   // Check for stored room data immediately
   const storedData = getStoredRoomData();
@@ -59,6 +61,43 @@ function init() {
     updateConnectionStatus('connecting');
     statusText.textContent = 'Reconnecting...';
   }
+}
+
+function setupPWAInstallPrompt() {
+  let deferredPrompt;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Stash the event so it can be triggered later
+    deferredPrompt = e;
+    // Show the install button
+    installBtn.style.display = 'block';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+
+    // Show the install prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    // Optionally, send analytics event with outcome of user choice
+    console.log(`User response to the install prompt: ${outcome}`);
+    // We've used the prompt, and can't use it again, throw it away
+    deferredPrompt = null;
+    // Hide the install button
+    installBtn.style.display = 'none';
+  });
+
+  window.addEventListener('appinstalled', () => {
+    // Hide the install button
+    installBtn.style.display = 'none';
+    // Clear the deferredPrompt so it can be garbage collected
+    deferredPrompt = null;
+    // Optionally, send analytics event to indicate successful install
+    console.log('PWA was installed');
+  });
 }
 
 // Bind DOM event listeners

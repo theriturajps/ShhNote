@@ -80,6 +80,27 @@ header h1 {
   opacity: 0.8;
 }
 
+.header-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0 10px;
+  font-size: 1.2rem;
+  color: var(--dark);
+  transition: color 0.2s;
+}
+
+.header-icon-btn:hover {
+  color: var(--primary);
+}
+
+.header-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .connection-status {
   display: flex;
   align-items: center;
