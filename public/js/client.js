@@ -41,6 +41,15 @@ let isTyping = false;
 let saveTimeout = null;
 let typingTimeout = null;
 
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 // Initialize the application
 function init() {
   if ('serviceWorker' in navigator) {
@@ -186,7 +195,7 @@ function sendMessage() {
   if (message && currentRoom) {
     socket.emit('chat-message', {
       roomId: currentRoom,
-      message: message
+      message: escapeHtml(message) // Escape before sending
     });
     chatInput.value = '';
   }
@@ -274,10 +283,17 @@ function setupSocketListeners() {
       const isCurrentUser = data.senderId === socket.id;
       const messageElement = document.createElement('div');
       messageElement.className = `chat-message ${isCurrentUser ? 'you' : ''}`;
-      messageElement.innerHTML = `
-      <span class="sender">${isCurrentUser ? 'You' : data.senderName}:</span>
-      <span class="message-text">${data.message}</span>
-    `;
+
+      const senderElement = document.createElement('span');
+      senderElement.className = 'sender';
+      senderElement.textContent = `${isCurrentUser ? 'You' : data.senderName}:`;
+
+      const textElement = document.createElement('span');
+      textElement.className = 'message-text';
+      textElement.textContent = data.message; // This is already escaped from the server
+
+      messageElement.appendChild(senderElement);
+      messageElement.appendChild(textElement);
       chatMessages.appendChild(messageElement);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }

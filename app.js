@@ -32,6 +32,15 @@ function randomIdGenerator() {
   return `${part1}-${part2}-${part3}`;
 }
 
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 io.on('connection', (socket) => {
   // console.log('User connected:', socket.id);
 
@@ -174,9 +183,9 @@ io.on('connection', (socket) => {
       if (user) {
         io.to(data.roomId).emit('chat-message', {
           roomId: data.roomId,
-          message: data.message,
+          message: escapeHtml(data.message), // Escape on server too
           senderId: socket.id,
-          senderName: user.name
+          senderName: escapeHtml(user.name) // Also escape the username
         });
       }
     }
