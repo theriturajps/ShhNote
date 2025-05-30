@@ -116,6 +116,9 @@
             </button>
           </div>
           <div class="room-actions">
+            <button id="chat-toggle-btn" class="action-btn" title="Open Chat">
+              <i class="fas fa-comment"></i>
+            </button>
             <button id="clear-room-btn" class="action-btn" title="Clear">
               <i class="fas fa-eraser"></i>
             </button>
@@ -136,6 +139,14 @@
               <i class="fas fa-users"></i>
               <span id="user-count">0</span>
             </div>
+          </div>
+        </div>
+
+        <div class="chat-container" style="display: none;">
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-container">
+            <input type="text" id="chat-input" placeholder="Type your message...">
+            <button id="send-message-btn"><i class="fas fa-paper-plane"></i></button>
           </div>
         </div>
 

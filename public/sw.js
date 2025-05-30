@@ -1,4 +1,6 @@
 const CACHE_NAME = 'shhnote-v1';
+
+// Only cache essential static assets for faster loading
 const ASSETS_TO_CACHE = [
 	'/',
 	'/index.html',
@@ -11,14 +13,18 @@ const ASSETS_TO_CACHE = [
 	'/images/shh.png',
 	'/images/github.png',
 	'/images/logo-192.png',
-	'/images/logo-512.png'
+	'/images/logo-512.png',
+	'/manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
+	// Cache only essential assets for faster loading when online
 	event.waitUntil(
 		caches.open(CACHE_NAME)
 			.then((cache) => cache.addAll(ASSETS_TO_CACHE))
 	);
+	// Skip waiting to activate immediately
+	self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -33,40 +39,6 @@ self.addEventListener('activate', (event) => {
 			);
 		})
 	);
-});
-
-// Intercept fetch requests to serve cached assets
-self.addEventListener('fetch', (event) => {
-	if (event.request.url.includes('/socket.io/')) {
-		return; // Skip caching for Socket.io connections
-	}
-
-	event.respondWith(
-		caches.match(event.request)
-			.then((response) => {
-				if (response) {
-					return response;
-				}
-
-				return fetch(event.request).then((response) => {
-					// Check if we received a valid response
-					if (!response || response.status !== 200 || response.type !== 'basic') {
-						return response;
-					}
-
-					// Clone the response
-					const responseToCache = response.clone();
-
-					caches.open(CACHE_NAME)
-						.then((cache) => {
-							cache.put(event.request, responseToCache);
-						});
-
-					return response;
-				}).catch(() => {
-					// If both fetch and cache fail, show a generic offline page
-					return caches.match('/offline.html');
-				});
-			})
-	);
+	// Take control of all clients immediately
+	return self.clients.claim();
 });

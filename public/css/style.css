@@ -475,6 +475,74 @@ main {
   color: var(--primary);
 }
 
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.chat-message {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: var(--gray-light);
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+}
+
+.chat-message .sender {
+  font-weight: 600;
+  color: var(--primary);
+  margin-right: 5px;
+}
+
+.chat-message.you .sender {
+  color: var(--success);
+}
+
+.chat-input-container {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid var(--gray-light);
+}
+
+#chat-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--gray-light);
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+}
+
+#chat-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+#send-message-btn {
+  margin-left: 10px;
+  padding: 0 15px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+}
+
+#send-message-btn:hover {
+  background: var(--primary-dark);
+}
+
 /* Buttons */
 button {
   cursor: pointer;

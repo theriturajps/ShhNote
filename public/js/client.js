@@ -24,6 +24,12 @@ const qrCodeElement = document.getElementById('qr-code');
 const roomUrlInput = document.getElementById('room-url-input');
 const copyUrlBtn = document.getElementById('copy-url-btn');
 const installBtn = document.getElementById('install-btn')
+const chatToggleBtn = document.getElementById('chat-toggle-btn');
+const editorContainer = document.querySelector('.editor-container');
+const chatContainer = document.querySelector('.chat-container');
+const chatMessages = document.getElementById('chat-messages');
+const chatInput = document.getElementById('chat-input');
+const sendMessageBtn = document.getElementById('send-message-btn');
 
 import { initializeSocket, socket } from './socket.js';
 import { showNotification } from './notifications.js';
@@ -162,6 +168,38 @@ function bindEventListeners() {
   deleteRoomBtn.addEventListener('click', deleteRoom);
   exitRoomBtn.addEventListener('click', exitRoom);
   textEditor.addEventListener('input', handleTextChange);
+  chatToggleBtn.addEventListener('click', toggleChat);
+  sendMessageBtn.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+}
+
+function toggleChat() {
+  const isChatVisible = chatContainer.style.display !== 'none';
+
+  if (isChatVisible) {
+    chatContainer.style.display = 'none';
+    editorContainer.style.display = 'flex';
+    chatToggleBtn.innerHTML = '<i class="fas fa-comment"></i>';
+    chatToggleBtn.title = 'Open Chat';
+  } else {
+    chatContainer.style.display = 'flex';
+    editorContainer.style.display = 'none';
+    chatToggleBtn.innerHTML = '<i class="fas fa-pen"></i>';
+    chatToggleBtn.title = 'Open Editor';
+  }
+}
+
+function sendMessage() {
+  const message = chatInput.value.trim();
+  if (message && currentRoom) {
+    socket.emit('chat-message', {
+      roomId: currentRoom,
+      message: message
+    });
+    chatInput.value = '';
+  }
 }
 
 // Setup Socket.IO listeners
@@ -239,6 +277,20 @@ function setupSocketListeners() {
   socket.on('room-deleted', () => {
     showWelcomeScreen();
     showNotification('Room has been deleted', 'info');
+  });
+
+  socket.on('chat-message', (data) => {
+    if (data.roomId === currentRoom) {
+      const isCurrentUser = data.senderId === socket.id;
+      const messageElement = document.createElement('div');
+      messageElement.className = `chat-message ${isCurrentUser ? 'you' : ''}`;
+      messageElement.innerHTML = `
+      <span class="sender">${isCurrentUser ? 'You' : data.senderName}:</span>
+      <span class="message-text">${data.message}</span>
+    `;
+      chatMessages.appendChild(messageElement);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
   });
 }
 

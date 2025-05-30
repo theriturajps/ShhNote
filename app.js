@@ -167,6 +167,20 @@ io.on('connection', (socket) => {
       }
     }
   });
+
+  socket.on('chat-message', (data) => {
+    if (currentRoom && rooms[currentRoom]) {
+      const user = rooms[currentRoom].users.find(u => u.id === socket.id);
+      if (user) {
+        io.to(data.roomId).emit('chat-message', {
+          roomId: data.roomId,
+          message: data.message,
+          senderId: socket.id,
+          senderName: user.name
+        });
+      }
+    }
+  });
 });
 
 const PORT = process.env.PORT || 3000;
