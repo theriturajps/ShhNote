@@ -359,6 +359,8 @@ main {
   gap: 15px;
   padding-bottom: 15px;
   width: 100%;
+  height: calc(100vh - 60px); /* Account for header height */
+  overflow: hidden; /* Prevent scrolling on the container */
 }
 
 .room-header {
@@ -484,13 +486,14 @@ main {
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
   overflow: hidden;
+  height: 100%; /* Take full available height */
 }
 
 .chat-messages {
   flex: 1;
   padding: 15px;
   overflow-y: auto;
-  max-height: 400px;
+  max-height: none; /* Remove fixed max-height */
 }
 
 .chat-message {
@@ -516,6 +519,9 @@ main {
   display: flex;
   padding: 10px;
   border-top: 1px solid var(--gray-light);
+  position: sticky;
+  bottom: 0;
+  background: white;
 }
 
 #chat-input {
@@ -709,6 +715,21 @@ button {
     width: 100%;
     justify-content: flex-end;
   }
+
+  #room-screen {
+    height: calc(100vh - 50px); /* Adjust for smaller header */
+    padding-bottom: 0;
+  }
+
+  .editor-container, 
+  .chat-container {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .users-panel {
+    display: none; /* Hide users panel on mobile or make it collapsible */
+  }
 }
 
 @media (max-width: 480px) {
@@ -722,5 +743,14 @@ button {
 
   .button-group {
     width: 100%;
+  }
+
+  .chat-message {
+    font-size: 0.9rem; /* Slightly larger text on small screens */
+    padding: 10px;
+  }
+  
+  #chat-input {
+    padding: 12px; /* More touch-friendly */
   }
 }
