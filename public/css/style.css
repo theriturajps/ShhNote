@@ -358,6 +358,7 @@ main {
   flex-direction: column;
   gap: 15px;
   padding-bottom: 15px;
+  width: 100%;
 }
 
 .room-header {
@@ -527,6 +528,10 @@ main {
 #chat-input:focus {
   outline: none;
   border-color: var(--primary);
+}
+
+span.message-text {
+  overflow-wrap: break-word;
 }
 
 #send-message-btn {
