@@ -161,13 +161,39 @@ function bindEventListeners() {
     });
   });
 
+  chatToggleBtn.addEventListener('click', () => {
+    const isChatOpen = chatContainer.style.display === 'flex';
+
+    if (isChatOpen) {
+      chatContainer.style.display = 'none';
+      roomScreen.classList.remove('chat-open');
+    } else {
+      chatContainer.style.display = 'flex';
+      roomScreen.classList.add('chat-open');
+      // Scroll to bottom when opening chat
+      setTimeout(() => {
+        const messages = document.querySelector('.chat-messages');
+        messages.scrollTop = messages.scrollHeight;
+      }, 100);
+    }
+  });
+
+  const chatInput = document.getElementById('chat-input');
+  chatInput.addEventListener('focus', () => {
+    if (window.innerWidth <= 768) {
+      setTimeout(() => {
+        const messages = document.querySelector('.chat-messages');
+        messages.scrollTop = messages.scrollHeight;
+      }, 300);
+    }
+  });
+
   // Keep the rest of your existing event listeners
   copyRoomIdBtn.addEventListener('click', copyRoomId);
   clearRoomBtn.addEventListener('click', clearRoom);
   deleteRoomBtn.addEventListener('click', deleteRoom);
   exitRoomBtn.addEventListener('click', exitRoom);
   textEditor.addEventListener('input', handleTextChange);
-  chatToggleBtn.addEventListener('click', toggleChat);
   sendMessageBtn.addEventListener('click', sendMessage);
   chatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
