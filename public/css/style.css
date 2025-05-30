@@ -498,7 +498,7 @@ main {
   padding: 8px 12px;
   background: var(--gray-light);
   border-radius: var(--border-radius);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .chat-message .sender {
