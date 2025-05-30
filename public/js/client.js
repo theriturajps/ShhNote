@@ -78,19 +78,16 @@ function setupPWAInstallPrompt() {
     installBtn.style.display = 'block';
   });
 
-  installBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response to the install prompt: ${outcome}`);
-    deferredPrompt = null;
-    installBtn.style.display = 'none';
+  installBtn.addEventListener('click', () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    }
   });
 
   window.addEventListener('appinstalled', () => {
     installBtn.style.display = 'none';
-    deferredPrompt = null;
-    console.log('PWA was installed');
   });
 }
 
