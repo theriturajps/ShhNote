@@ -174,6 +174,18 @@ function bindEventListeners() {
   });
 }
 
+function sendMessage() {
+  const message = chatInput.value.trim();
+  if (message && currentRoom) {
+    socket.emit('chat-message', {
+      roomId: currentRoom,
+      message: message // Server will escape this
+    });
+    chatInput.value = '';
+    chatInput.focus(); // Keep focus on input for next message
+  }
+}
+
 function toggleChat() {
   const isChatVisible = chatContainer.style.display !== 'none';
 
@@ -187,17 +199,6 @@ function toggleChat() {
     editorContainer.style.display = 'none';
     chatToggleBtn.innerHTML = '<i class="fas fa-pen"></i>';
     chatToggleBtn.title = 'Open Editor';
-  }
-}
-
-function sendMessage() {
-  const message = chatInput.value.trim();
-  if (message && currentRoom) {
-    socket.emit('chat-message', {
-      roomId: currentRoom,
-      message: escapeHtml(message) // Escape before sending
-    });
-    chatInput.value = '';
   }
 }
 
@@ -286,11 +287,12 @@ function setupSocketListeners() {
 
       const senderElement = document.createElement('span');
       senderElement.className = 'sender';
-      senderElement.textContent = `${isCurrentUser ? 'You' : data.senderName}:`;
+      senderElement.textContent = `${isCurrentUser ? 'You' : data.senderName}: `;
 
       const textElement = document.createElement('span');
       textElement.className = 'message-text';
-      textElement.textContent = data.message; // This is already escaped from the server
+      // The server has already escaped, so we can safely set as text
+      textElement.textContent = data.message;
 
       messageElement.appendChild(senderElement);
       messageElement.appendChild(textElement);
