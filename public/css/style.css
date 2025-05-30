@@ -505,6 +505,7 @@ main {
   font-weight: 600;
   color: var(--primary);
   margin-right: 5px;
+  white-space: nowrap;
 }
 
 .chat-message.you .sender {
