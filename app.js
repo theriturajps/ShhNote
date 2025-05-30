@@ -183,9 +183,9 @@ io.on('connection', (socket) => {
       if (user) {
         io.to(data.roomId).emit('chat-message', {
           roomId: data.roomId,
-          message: escapeHtml(data.message), // Server escapes once
+          message: data.message, // Send raw message
           senderId: socket.id,
-          senderName: escapeHtml(user.name)
+          senderName: user.name  // Send raw name
         });
       }
     }

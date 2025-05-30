@@ -291,8 +291,10 @@ function setupSocketListeners() {
 
       const textElement = document.createElement('span');
       textElement.className = 'message-text';
-      // The server has already escaped, so we can safely set as text
-      textElement.textContent = data.message;
+
+      // Create a text node instead of setting textContent
+      const messageText = document.createTextNode(data.message);
+      textElement.appendChild(messageText);
 
       messageElement.appendChild(senderElement);
       messageElement.appendChild(textElement);
